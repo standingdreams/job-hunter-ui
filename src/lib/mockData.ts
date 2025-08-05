@@ -231,3 +231,75 @@ export const navigationItems = [
   { title: 'Profile', icon: '👤', href: '/profile' },
   { title: 'Settings', icon: '⚙️', href: '/settings' },
 ];
+
+export const jobData = {
+  id: 1,
+  title: 'Senior Frontend Developer',
+  company: 'TechCorp Inc.',
+  location: 'San Francisco, CA',
+  type: 'Full-time',
+  salary: '$120,000 - $160,000',
+  posted: '2 days ago',
+  platform: 'LinkedIn',
+  tags: ['React', 'TypeScript', 'JavaScript', 'CSS', 'Node.js'],
+  description: `We are seeking a talented Senior Frontend Developer to join our dynamic engineering team. You will be responsible for building and maintaining high-quality web applications that serve millions of users worldwide. This role offers the opportunity to work with cutting-edge technologies and collaborate with a team of passionate developers.`,
+  responsibilities: [
+    'Develop and maintain responsive web applications using React and TypeScript',
+    'Collaborate with UX/UI designers to implement pixel-perfect designs',
+    'Optimize applications for maximum speed and scalability',
+    'Write clean, maintainable, and well-documented code',
+    'Participate in code reviews and mentor junior developers',
+    'Work closely with backend developers to integrate APIs',
+    'Stay up-to-date with the latest frontend technologies and best practices',
+  ],
+  qualifications: [
+    '5+ years of experience in frontend development',
+    'Expert knowledge of React, TypeScript, and modern JavaScript (ES6+)',
+    'Strong understanding of HTML5, CSS3, and responsive design principles',
+    'Experience with state management libraries (Redux, Zustand, or similar)',
+    'Familiarity with testing frameworks (Jest, React Testing Library)',
+    'Knowledge of build tools and bundlers (Webpack, Vite, or similar)',
+    'Experience with version control systems (Git)',
+    'Strong problem-solving skills and attention to detail',
+  ],
+  preferredQualifications: [
+    'Experience with Next.js or other React frameworks',
+    'Knowledge of GraphQL and Apollo Client',
+    'Familiarity with cloud platforms (AWS, GCP, or Azure)',
+    'Experience with CI/CD pipelines',
+    'Understanding of web accessibility standards (WCAG)',
+    'Previous experience in a fast-paced startup environment',
+  ],
+  benefits: [
+    'Competitive salary and equity package',
+    'Comprehensive health, dental, and vision insurance',
+    'Flexible work arrangements and remote work options',
+    'Professional development budget ($2,000/year)',
+    'Unlimited PTO policy',
+    'State-of-the-art equipment and workspace',
+    'Team building events and company retreats',
+  ],
+};
+
+export const companyData = {
+  name: 'TechCorp Inc.',
+  logo: '/placeholder.svg?height=80&width=80&text=TC',
+  overview:
+    'TechCorp Inc. is a leading technology company that specializes in building innovative software solutions for businesses worldwide. Founded in 2015, we have grown from a small startup to a company of over 500 employees across multiple offices.',
+  culture:
+    'We believe in fostering a collaborative and inclusive work environment where every team member can thrive. Our culture is built on innovation, transparency, and continuous learning. We encourage our employees to take ownership of their work and contribute to meaningful projects that impact millions of users.',
+  size: '500-1000 employees',
+  founded: '2015',
+  industry: 'Technology',
+  website: 'https://techcorp.com',
+  socialMedia: {
+    linkedin: 'https://linkedin.com/company/techcorp',
+    twitter: 'https://twitter.com/techcorp',
+    facebook: 'https://facebook.com/techcorp',
+  },
+  stats: {
+    employees: '500+',
+    offices: '5',
+    countries: '3',
+  },
+};
