@@ -1,0 +1,20 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "utils/**/*.ts",
+    "*.js",
+    "*.mjs",
+    "*.ts",
+    "*.tsx"
+  ],
+  "exclude": [
+    "src/constants/generated-types.ts",
+    "src/constants/possible-types.ts",
+    "src/routeTree.gen.ts"
+  ],
+  "compilerOptions": {
+    "noEmit": true
+  }
+}
