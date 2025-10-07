@@ -18,11 +18,11 @@ export const jobSites: JobSite[] = [
   { id: JobSiteId.Indeed, name: 'Indeed' },
   { id: JobSiteId.LinkedIn, name: 'LinkedIn' },
   { id: JobSiteId.ZipRecruiter, name: 'ZipRecruiter' },
-  { id: JobSiteId.Bayt, name: 'Bayt' },
   { id: JobSiteId.Google, name: 'Google' },
   { id: JobSiteId.Glassdoor, name: 'Glassdoor' },
-  { id: JobSiteId.Naukri, name: 'Naukri' },
-  { id: JobSiteId.Bdjobs, name: 'Bdjobs' },
+  // { id: JobSiteId.Bayt, name: 'Bayt' },
+  // { id: JobSiteId.Naukri, name: 'Naukri' },
+  // { id: JobSiteId.Bdjobs, name: 'Bdjobs' },
 ];
 
 // Helper function to get site name from job site ID

@@ -34,7 +34,23 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 
 import { BaseLayout } from '@/layouts/BaseLayout';
-import { DATE_POSTED_OPTIONS, JOB_TYPES, getSiteName } from '@/lib/shared';
+import {
+  DATE_POSTED_OPTIONS,
+  JOB_TYPES,
+  getSiteName,
+  jobSites,
+} from '@/lib/shared';
+
+interface Job {
+  id: string;
+  title: string;
+  company: string;
+  location: string;
+  date_posted?: string;
+  min_amount?: number;
+  max_amount?: number;
+  site: string;
+}
 
 const jobSearchSchema = z.object({
   searchQuery: z.string().optional(),
@@ -43,6 +59,7 @@ const jobSearchSchema = z.object({
   hoursOld: z.string().optional(),
   currentPage: z.number().optional(),
   includeRemote: z.boolean().optional(),
+  jobSites: z.array(z.string()).optional(),
 });
 
 export const Route = createFileRoute('/')({
@@ -58,21 +75,30 @@ function JobSearchDashboard() {
     hoursOld,
     currentPage,
     includeRemote,
+    jobSites: selectedJobSites,
   } = Route.useSearch();
   const navigate = Route.useNavigate();
 
   const searchQueryValue = searchQuery ?? '';
   const jobTypeValue = jobType ?? 'all';
-  const locationValue = location ?? 'Atlanta, GA';
+  const locationValue = location ?? '';
   const hoursOldValue = hoursOld ?? '72';
   const currentPageValue = currentPage ?? 1;
   const includeRemoteValue = includeRemote !== false;
+  const selectedJobSitesValue = selectedJobSites ?? [
+    'indeed',
+    'linkedin',
+    'google',
+  ];
   const jobsPerPage = 4;
 
   // Debounce search query and location to avoid excessive API calls
   const [debouncedSearchQuery] = useDebounce(searchQueryValue, 500);
   const [debouncedLocation] = useDebounce(locationValue, 500);
-  const searchParams = useSearch({ strict: false }) as any;
+  const searchParams = useSearch({
+    strict: false,
+    structuralSharing: false,
+  }) as Record<string, any>;
 
   const updateSearchParams = useCallback(
     (updates: Record<string, any>) => {
@@ -84,12 +110,9 @@ function JobSearchDashboard() {
       };
 
       Object.keys(newParams).forEach((key) => {
-        if (
-          newParams[key] === '' ||
-          newParams[key] === null ||
-          newParams[key] === undefined
-        ) {
-          delete newParams[key];
+        const value = (newParams as Record<string, any>)[key];
+        if (value === '' || value === null || value === undefined) {
+          delete (newParams as Record<string, any>)[key];
         }
       });
 
@@ -137,6 +160,13 @@ function JobSearchDashboard() {
     [updateSearchParams],
   );
 
+  const setJobSites = useCallback(
+    (value: string[]) => {
+      updateSearchParams({ jobSites: value.length > 0 ? value : undefined });
+    },
+    [updateSearchParams],
+  );
+
   const clearAllFilters = useCallback(() => {
     navigate({
       to: '/',
@@ -160,6 +190,7 @@ function JobSearchDashboard() {
     location: string;
     hoursOld: string;
     includeRemote: boolean;
+    jobSites: string[];
     offset: number;
   }) => {
     const params = new URLSearchParams({
@@ -177,8 +208,7 @@ function JobSearchDashboard() {
     });
 
     // Add multiple site_name parameters
-    const siteNames = ['indeed', 'linkedin', 'google'];
-    siteNames.forEach((site) => {
+    queryParams.jobSites.forEach((site) => {
       params.append('site_name', site);
     });
 
@@ -217,6 +247,7 @@ function JobSearchDashboard() {
       debouncedLocation,
       hoursOldValue,
       includeRemoteValue,
+      selectedJobSitesValue,
       currentPageValue,
     ],
     queryFn: () =>
@@ -226,6 +257,7 @@ function JobSearchDashboard() {
         location: debouncedLocation,
         hoursOld: hoursOldValue,
         includeRemote: includeRemoteValue,
+        jobSites: selectedJobSitesValue,
         offset,
       }),
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -248,6 +280,7 @@ function JobSearchDashboard() {
     debouncedLocation,
     hoursOldValue,
     includeRemoteValue,
+    selectedJobSitesValue,
   ];
   const prevFilterDepsRef = useRef(filterDeps);
 
@@ -357,9 +390,43 @@ function JobSearchDashboard() {
               htmlFor="include-remote"
               className="cursor-pointer text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              Include Remote Jobs
+              Only Remote Jobs
             </label>
           </div>
+
+          {/* Job Sites Multi-Select */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="gap-2">
+                Job Sites ({selectedJobSitesValue.length})
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              {jobSites.map((site) => (
+                <DropdownMenuItem
+                  key={site.id}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const isSelected = selectedJobSitesValue.includes(site.id);
+                    if (isSelected) {
+                      setJobSites(
+                        selectedJobSitesValue.filter((id) => id !== site.id),
+                      );
+                    } else {
+                      setJobSites([...selectedJobSitesValue, site.id]);
+                    }
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  <Checkbox
+                    checked={selectedJobSitesValue.includes(site.id)}
+                    onChange={() => {}}
+                  />
+                  {site.name}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
       {/* Results Summary */}
@@ -368,7 +435,7 @@ function JobSearchDashboard() {
           {isLoading
             ? 'Loading jobs...'
             : error
-              ? 'Error loading jobs'
+              ? ''
               : totalJobs > 0
                 ? `Showing ${startIndex + 1}-${startIndex + jobs.length} of ${totalJobs} jobs`
                 : 'No jobs found'}
@@ -429,23 +496,27 @@ function JobSearchDashboard() {
           ))
         ) : error ? (
           // Error state
-          <Card className="p-12 text-center">
-            <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-red-50">
+          <Card className="flex flex-col items-center justify-center gap-3 p-12 text-center">
+            <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-red-50">
               <div className="h-8 w-8 text-red-500">⚠️</div>
             </div>
-            <h3 className="mb-2 text-lg font-semibold">Error loading jobs</h3>
-            <p className="text-muted-foreground mb-4">
+            <h3 className="text-lg font-semibold">Error loading jobs</h3>
+            <p className="text-muted-foreground">
               {error instanceof Error
                 ? error.message
                 : 'An unexpected error occurred while fetching jobs.'}
             </p>
-            <Button variant="outline" onClick={() => window.location.reload()}>
+            <Button
+              className="max-w-52"
+              variant="outline"
+              onClick={() => window.location.reload()}
+            >
               Try again
             </Button>
           </Card>
         ) : paginatedJobs.length > 0 ? (
           // Job listings
-          paginatedJobs.map((job: any) => (
+          paginatedJobs.map((job: Job) => (
             <Card
               key={job.id}
               className="cursor-pointer transition-shadow hover:shadow-md"
